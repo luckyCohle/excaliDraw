@@ -3,30 +3,12 @@ export declare const CreateUserSchema: z.ZodObject<{
     email: z.ZodString;
     password: z.ZodString;
     username: z.ZodString;
-}, "strip", z.ZodTypeAny, {
-    email: string;
-    password: string;
-    username: string;
-}, {
-    email: string;
-    password: string;
-    username: string;
-}>;
+}, z.core.$strip>;
 export declare const SigninSchema: z.ZodObject<{
     email: z.ZodString;
     password: z.ZodString;
-}, "strip", z.ZodTypeAny, {
-    email: string;
-    password: string;
-}, {
-    email: string;
-    password: string;
-}>;
+}, z.core.$strip>;
 export declare const CreateRoomSchema: z.ZodObject<{
     name: z.ZodString;
-}, "strip", z.ZodTypeAny, {
-    name: string;
-}, {
-    name: string;
-}>;
+}, z.core.$strip>;
 //# sourceMappingURL=types.d.ts.map

@@ -5,7 +5,6 @@ import { auth } from "./middleware.js";
 import { CreateUserSchema, SigninSchema, CreateRoomSchema } from "./types.js";
 import { PrismaClient } from "@prisma/client";
 import cors from 'cors'
-import { isValid } from "zod";
 
 
 const app = express();
