@@ -21,7 +21,7 @@ export function auth(req: Request, res: Response, next: NextFunction) {
     const decoded = jwt.verify(token, JWT_SECRET)as JwtPayload;
 
     if (decoded) {
-        // @ts-ignore: TODO: Fix this
+        // @ts-ignore
         req.userId = decoded.userId;
         console.log("middleware log ,userId = "+decoded.userId)
         next();
@@ -32,6 +32,9 @@ export function auth(req: Request, res: Response, next: NextFunction) {
     }
     } catch (error) {
         console.error(error);
-        
+        res.send({
+            msg:"error in auth",
+            error:error
+        })
     }
 }

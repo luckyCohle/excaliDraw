@@ -7,7 +7,7 @@ import { PrismaClient } from "@prisma/client";
 import cors from 'cors';
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({ origin: '*' }));
 const prisma = new PrismaClient();
 export const JWT_SECRET = process.env.JWT_SECRET || "123123";
 app.post("/signup", async (req, res) => {

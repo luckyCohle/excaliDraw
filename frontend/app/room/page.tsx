@@ -34,66 +34,58 @@ const RoomPage = () => {
     setRoomsArray();
   }, []);
 
-  const handleCreateRoom = async() => {
-    if (!newRoomName.trim()) {
-      toast.error("Room name cannot be empty!");
-      return;
-    }
-    setIsCreatingRoom(true);
-    const accessToken = localStorage.getItem("token");
+const handleCreateRoom = async () => {
+  console.log("room create request recieved ")
+  if (!newRoomName.trim()) {
+    toast.error("Room name cannot be empty!");
+    return;
+  }
+  console.log("room name is not empty");
 
-    if (!accessToken) {
-      toast.error("You need to login to create Room");
-      setIsCreatingRoom(false);
-      router.push("/signin");
-      return;
+  const accessToken = localStorage.getItem("token");
+  if (!accessToken) {
+    console.log("no access token found")
+    toast.error("You need to login to create Room");
+    router.push("/signin");
+    return;
+  }
+
+  setIsCreatingRoom(true);
+
+  try {
+    const response = await axios.post(
+      `${httpUrl}/room`,
+      { name: newRoomName },
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    );
+    console.log("request sent");
+
+    const newRoom: Room = {
+      id: response.data.roomId,
+      roomName: newRoomName,
+      adminId: response.data.adminId,
+      adminName: response.data.adminName,
+    };
+    console.log("checkpoint 1")
+    setRooms([...rooms, newRoom]);
+    setNewRoomName("");
+    toast.success("Room added successfully");
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      if (error.response?.status === 401) {
+        toast.error("Authentication failed. Please log in again.");
+        setTimeout(() => router.push("/login"), 3000);
+      } else {
+        toast.error(error.response?.data?.message || "An error occurred.");
+      }
+    } else {
+      console.error("Unexpected error:", error);
     }
-    
-    axios
-      .post(
-        `${httpUrl}/room`,
-        { name: newRoomName },
-        { headers: { Authorization: `Bearer ${accessToken}` } }
-      )
-      .then((response) => {
-        const newRoom:Room = {
-          id:response.data.roomId,
-          roomName:newRoomName,
-          adminId:response.data.adminId,
-          adminName:response.data.adminName
-        }
-        console.log(rooms)
-        // Create a new array with the updated rooms
-  const updatedRooms = [...rooms, newRoom];
-  
-  // Set the state with the new array
-  setRooms(updatedRooms);
-  console.log("after push =>");
-  console.log(updatedRooms);
-  setIsCreatingRoom(false);
-  setNewRoomName("");
-        toast.success("room added successfully")
-      })
-      .catch((error) => {
-        setIsCreatingRoom(false);
-        console.log(error);
-    
-        if (axios.isAxiosError(error)) {
-          if (error.response?.status === 401) {
-            toast.error("Authentication failed. Please log in again.");
-            setIsCreatingRoom(false);
-            setTimeout(() => {
-              router.push("/login");
-            }, 3000);
-          } else {
-            toast.error(error.response?.data?.message || "An error occurred.");
-          }
-        } else {
-          console.error("Unexpected error:", error);
-        }
-      });
-    
-  };
+  } finally {
+    setIsCreatingRoom(false);
+  }
+};
+
   const handleRoomJoin=()=>{
     if (!roomToJoin) {
       return;
@@ -127,8 +119,8 @@ const RoomPage = () => {
           <h3 className="text-lg font-semibold  text-gray-700 mb-2">Available Rooms</h3>
           <div className="h-48 overflow-y-auto">
             <ul className="space-y-2">
-              {rooms.length!=0?rooms?.map((room) => (
-                <li key={room.id} onClick={()=>setRoomToJoin(room.id)} className={`bg-gray-50  py-2 flex justify-between px-4 rounded-md text-gray-800 text-sm font-medium shadow-sm transition ${roomToJoin === room.id ? "bg-violet-500 hover:bg-violet-700 text-white font-bold" : " hover:bg-gray-100"}`}>
+              {rooms.length!=0?rooms?.map((room,index) => (
+                <li key={room.id??index} onClick={()=>setRoomToJoin(room.id)} className={`bg-gray-50  py-2 flex justify-between px-4 rounded-md text-gray-800 text-sm font-medium shadow-sm transition ${roomToJoin === room.id ? "bg-violet-500 hover:bg-violet-700 text-white font-bold" : " hover:bg-gray-100"}`}>
                   <p className="font-semibold">{room.roomName}</p><p>admin name:&nbsp;{room.adminName}</p>
                 </li>
               )) :<h3>No rooms Available , You can create your own room</h3>}
